@@ -4,18 +4,24 @@ fn main() {
     let mut deck: HashMap<String, i8> = build_deck();
     let mut player_hand: HashMap<String, i8> = HashMap::new();
     let mut dealer_hand: HashMap<String, i8> = HashMap::new();
-    // for cards in deck.keys(){
-    //     print!("{}\n", cards)
-    // }
+
     for _ in 0..2 {
         deal_card(&mut deck, &mut player_hand);
         deal_card(&mut deck, &mut dealer_hand);
     }
-    print!("Player hand: {:?} ", player_hand);
-    print!("Dealer hand: {:?} ", dealer_hand);
-    for cards in deck.keys(){
-        print!("{}\n", cards)
+
+    see_hand(&player_hand, "Player");
+    see_hand(&dealer_hand, "Dealer");
+
+}
+
+fn see_hand(hand: &HashMap<String, i8>, hand_name: &str) {
+    println!("Cards in {} Hand:", hand_name);
+    for (card, value) in hand.iter() {
+        println!("{}: {}", card, value);
     }
+    let total: i8 = hand.values().sum();
+    println!("{}'s Hand value: {}\n", hand_name, total);
 }
 
 fn build_deck() -> HashMap<String, i8> {
@@ -30,9 +36,7 @@ fn build_deck() -> HashMap<String, i8> {
             deck.insert(card, values[i]);
         }
     }
-
     deck
-
 }
 
 fn deal_card(deck: &mut HashMap<String, i8>, hand: &mut HashMap<String, i8>) {
