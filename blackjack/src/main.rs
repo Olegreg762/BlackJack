@@ -9,19 +9,38 @@ fn main() {
         deal_card(&mut deck, &mut player_hand);
         deal_card(&mut deck, &mut dealer_hand);
     }
-
-    see_hand(&player_hand, "Player");
-    see_hand(&dealer_hand, "Dealer");
-
+    
+    has_bust(&player_hand, "Player");
+    has_bust(&dealer_hand, "Dealer");
 }
 
-fn see_hand(hand: &HashMap<String, i8>, hand_name: &str) {
+fn has_bust(hand: &HashMap<String, i8>, hand_name: &str)-> bool{
+    let value: i8 = check_hand_value(hand, hand_name);
+    if value > 21 {
+        println!("{} has busted!\n", hand_name);
+        true
+    } else if value == 21 {
+        println!("{} has BackJack!!.\n", hand_name);
+        false
+    } else {
+        println!("{} is still in the game.\n", hand_name);
+        false
+    }
+}
+
+fn check_hand_value(hand: &HashMap<String, i8>, hand_name: &str) -> i8 {
+    let total: i8 = hand.values().sum();
+    println!("{}'s Hand Value: {}\n",hand_name, total);
+
+    total
+}
+
+fn _see_hand(hand: &HashMap<String, i8>, hand_name: &str) {
     println!("Cards in {} Hand:", hand_name);
     for (card, value) in hand.iter() {
         println!("{}: {}", card, value);
     }
-    let total: i8 = hand.values().sum();
-    println!("{}'s Hand value: {}\n", hand_name, total);
+    check_hand_value(hand, hand_name);
 }
 
 fn build_deck() -> HashMap<String, i8> {
