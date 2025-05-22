@@ -10,11 +10,11 @@ fn main() {
         deal_card(&mut deck, &mut dealer_hand);
     }
     
-    has_bust(&player_hand, "Player");
-    has_bust(&dealer_hand, "Dealer");
+    has_bust(&mut player_hand, "Player");
+    has_bust(&mut dealer_hand, "Dealer");
 }
 
-fn has_bust(hand: &HashMap<String, i8>, hand_name: &str)-> bool{
+fn has_bust(hand: &mut HashMap<String, i8>, hand_name: &str)-> bool{
     let value: i8 = check_hand_value(hand, hand_name);
     if value > 21 {
         println!("{} has busted!\n", hand_name);
@@ -28,14 +28,23 @@ fn has_bust(hand: &HashMap<String, i8>, hand_name: &str)-> bool{
     }
 }
 
-fn check_hand_value(hand: &HashMap<String, i8>, hand_name: &str) -> i8 {
-    let total: i8 = hand.values().sum();
+fn check_hand_value(hand: &mut HashMap<String, i8>, hand_name: &str) -> i8 {
+    let mut total: i8 = hand.values().sum();
+    if total > 21 && hand.keys().any(|card| card.starts_with("Ace")) {
+        for (card, value) in hand.iter_mut() {
+            if card.starts_with("Ace") && *value == 11 {
+                *value = 1;
+                total = hand.values().sum();
+                break;
+            }
+        }
+    }
     println!("{}'s Hand Value: {}\n",hand_name, total);
 
     total
 }
 
-fn _see_hand(hand: &HashMap<String, i8>, hand_name: &str) {
+fn _see_hand(hand: &mut HashMap<String, i8>, hand_name: &str) {
     println!("Cards in {} Hand:", hand_name);
     for (card, value) in hand.iter() {
         println!("{}: {}", card, value);
