@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::io;
 
 fn main() {
     let mut deck: HashMap<String, i8> = build_deck();
@@ -12,23 +13,66 @@ fn main() {
     
     has_bust(&mut player_hand, "Player");
     has_bust(&mut dealer_hand, "Dealer");
+
+    see_hand(&mut player_hand, "Player");
+
+    play_game(&mut deck, &mut player_hand, &mut dealer_hand);
+}
+
+fn play_game(deck: &mut HashMap<String, i8>, player_hand: &mut HashMap<String, i8>, dealer_hand: &mut HashMap<String, i8>) {
+    loop {
+        let mut choice: String = String::new();
+        println!("Do you want to hit or stay? (h/s)");
+        io::stdin().read_line(&mut choice).expect("Failed to read line");
+        let choice: char = choice.trim().chars().next().unwrap_or(' ');
+
+        match choice {
+            'h' => {
+                deal_card(deck, player_hand);
+                see_hand(player_hand, "Player");
+                if has_bust(player_hand, "Player") {
+                    break;
+                }
+            },
+            's' => {
+                println!("You chose to stay.");
+                break;
+            },
+            _ => println!("Invalid choice. Please enter 'h' or 's'."),
+        }
+    }
+    while check_hand_value(dealer_hand, "Dealer") < 17 {
+        deal_card(deck, dealer_hand);
+        has_bust(dealer_hand, "Dealer");
+    }
+    
+    if check_hand_value(dealer_hand, "Dealer") > check_hand_value(player_hand, "Player") {
+        println!("Dealer wins!");
+    } else if check_hand_value(dealer_hand, "Dealer") < check_hand_value(player_hand, "Player") {
+        println!("Player wins!");
+    } else {
+        println!("It's a tie!");
+    }
+    
 }
 
 fn has_bust(hand: &mut HashMap<String, i8>, hand_name: &str)-> bool{
     let value: i8 = check_hand_value(hand, hand_name);
     if value > 21 {
         println!("{} has busted!\n", hand_name);
-        true
+        println!("{} has lost the game.\n", hand_name);
+        std::process::exit(0);
     } else if value == 21 {
-        println!("{} has BackJack!!.\n", hand_name);
-        false
+        println!("{} has BackJack!!!\n", hand_name);
+        println!("{} has won the game.\n", hand_name);
+        std::process::exit(0);
     } else {
         println!("{} is still in the game.\n", hand_name);
         false
     }
 }
 
-fn check_hand_value(hand: &mut HashMap<String, i8>, hand_name: &str) -> i8 {
+fn check_hand_value(hand: &mut HashMap<String, i8>, _hand_name: &str) -> i8 {
     let mut total: i8 = hand.values().sum();
     if total > 21 && hand.keys().any(|card| card.starts_with("Ace")) {
         for (card, value) in hand.iter_mut() {
@@ -39,17 +83,15 @@ fn check_hand_value(hand: &mut HashMap<String, i8>, hand_name: &str) -> i8 {
             }
         }
     }
-    println!("{}'s Hand Value: {}\n",hand_name, total);
-
     total
 }
 
-fn _see_hand(hand: &mut HashMap<String, i8>, hand_name: &str) {
+fn see_hand(hand: &mut HashMap<String, i8>, hand_name: &str) {
     println!("Cards in {} Hand:", hand_name);
     for (card, value) in hand.iter() {
         println!("{}: {}", card, value);
     }
-    check_hand_value(hand, hand_name);
+    println!("Hand Value: {}",check_hand_value(hand, hand_name));
 }
 
 fn build_deck() -> HashMap<String, i8> {
