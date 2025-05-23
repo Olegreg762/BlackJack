@@ -30,9 +30,7 @@ fn play_game(deck: &mut HashMap<String, i8>, player_hand: &mut HashMap<String, i
             'h' => {
                 deal_card(deck, player_hand);
                 see_hand(player_hand, "Player");
-                if has_bust(player_hand, "Player") {
-                    break;
-                }
+                has_bust(player_hand, "Player") 
             },
             's' => {
                 println!("You chose to stay.");
@@ -53,22 +51,22 @@ fn play_game(deck: &mut HashMap<String, i8>, player_hand: &mut HashMap<String, i
     } else {
         println!("It's a tie!");
     }
+    play_again();
     
 }
 
-fn has_bust(hand: &mut HashMap<String, i8>, hand_name: &str)-> bool{
+fn has_bust(hand: &mut HashMap<String, i8>, hand_name: &str){
     let value: i8 = check_hand_value(hand, hand_name);
     if value > 21 {
         println!("{} has busted!\n", hand_name);
         println!("{} has lost the game.\n", hand_name);
-        std::process::exit(0);
+        play_again();
     } else if value == 21 {
         println!("{} has BackJack!!!\n", hand_name);
         println!("{} has won the game.\n", hand_name);
-        std::process::exit(0);
+        play_again();
     } else {
         println!("{} is still in the game.\n", hand_name);
-        false
     }
 }
 
@@ -117,4 +115,24 @@ fn deal_card(deck: &mut HashMap<String, i8>, hand: &mut HashMap<String, i8>) {
     }
 }
     
+fn play_again() {
+    let mut play_again: String = String::new();
+    println!("Do you want to play again? (y/n)");
+    io::stdin().read_line(&mut play_again).expect("Failed to read line");
+    let play_again: char = play_again.trim().chars().next().unwrap_or(' ');
 
+    match play_again {
+        'y' => {
+            println!("Starting a new game...");
+            main();
+        },
+        'n' => {
+            println!("Thanks for playing!");
+            std::process::exit(0);
+        },
+        _ => {
+            println!("Invalid choice. Please enter 'y' or 'n'.");
+            
+        }
+    }
+}
