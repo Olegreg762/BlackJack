@@ -2,6 +2,15 @@ use std::collections::HashMap;
 use std::io;
 
 fn main() {
+    loop{
+    play_game();
+    if !play_again(){
+        break;
+    }
+    }
+}
+
+fn play_game() {
     let mut deck: HashMap<String, i8> = build_deck();
     let mut player_hand: HashMap<String, i8> = HashMap::new();
     let mut dealer_hand: HashMap<String, i8> = HashMap::new();
@@ -11,15 +20,12 @@ fn main() {
         deal_card(&mut deck, &mut dealer_hand);
     }
     
-    has_bust(&mut player_hand, "Player");
-    has_bust(&mut dealer_hand, "Dealer");
+    if has_bust(&mut player_hand, "Player") || has_bust(&mut dealer_hand, "Dealer"){
+        return;
+    }
 
     see_hand(&mut player_hand, "Player");
 
-    play_game(&mut deck, &mut player_hand, &mut dealer_hand);
-}
-
-fn play_game(deck: &mut HashMap<String, i8>, player_hand: &mut HashMap<String, i8>, dealer_hand: &mut HashMap<String, i8>) {
     loop {
         let mut choice: String = String::new();
         println!("Do you want to hit or stay? (h/s)");
@@ -28,9 +34,11 @@ fn play_game(deck: &mut HashMap<String, i8>, player_hand: &mut HashMap<String, i
 
         match choice {
             'h' => {
-                deal_card(deck, player_hand);
-                see_hand(player_hand, "Player");
-                has_bust(player_hand, "Player") 
+                deal_card(&mut deck, &mut player_hand);
+                see_hand(&mut player_hand, "Player");
+                if has_bust(&mut player_hand, "Player") {
+                    return;
+                }
             },
             's' => {
                 println!("You chose to stay.");
@@ -39,34 +47,36 @@ fn play_game(deck: &mut HashMap<String, i8>, player_hand: &mut HashMap<String, i
             _ => println!("Invalid choice. Please enter 'h' or 's'."),
         }
     }
-    while check_hand_value(dealer_hand, "Dealer") < 17 {
-        deal_card(deck, dealer_hand);
-        has_bust(dealer_hand, "Dealer");
+    while check_hand_value(&mut dealer_hand, "Dealer") < 17 {
+        deal_card(&mut deck, &mut dealer_hand);
+        if has_bust(&mut dealer_hand, "Dealer"){
+            return;
+        }
     }
     
-    if check_hand_value(dealer_hand, "Dealer") > check_hand_value(player_hand, "Player") {
+    if check_hand_value(&mut dealer_hand, "Dealer") > check_hand_value(&mut player_hand, "Player") {
         println!("Dealer wins!");
-    } else if check_hand_value(dealer_hand, "Dealer") < check_hand_value(player_hand, "Player") {
+    } else if check_hand_value(&mut dealer_hand, "Dealer") < check_hand_value(&mut player_hand, "Player") {
         println!("Player wins!");
     } else {
         println!("It's a tie!");
     }
-    play_again();
     
 }
 
-fn has_bust(hand: &mut HashMap<String, i8>, hand_name: &str){
+fn has_bust(hand: &mut HashMap<String, i8>, hand_name: &str) -> bool{
     let value: i8 = check_hand_value(hand, hand_name);
     if value > 21 {
         println!("{} has busted!\n", hand_name);
         println!("{} has lost the game.\n", hand_name);
-        play_again();
+        return true;
     } else if value == 21 {
         println!("{} has BackJack!!!\n", hand_name);
         println!("{} has won the game.\n", hand_name);
-        play_again();
+        return true;
     } else {
         println!("{} is still in the game.\n", hand_name);
+        return false;
     }
 }
 
@@ -115,24 +125,25 @@ fn deal_card(deck: &mut HashMap<String, i8>, hand: &mut HashMap<String, i8>) {
     }
 }
     
-fn play_again() {
+fn play_again() -> bool{
+    loop{
     let mut play_again: String = String::new();
     println!("Do you want to play again? (y/n)");
     io::stdin().read_line(&mut play_again).expect("Failed to read line");
     let play_again: char = play_again.trim().chars().next().unwrap_or(' ');
-
+    
     match play_again {
         'y' => {
             println!("Starting a new game...");
-            main();
+            return true;    
         },
         'n' => {
             println!("Thanks for playing!");
-            std::process::exit(0);
+            return false;           
         },
         _ => {
-            println!("Invalid choice. Please enter 'y' or 'n'.");
-            
+            println!("Invalid choice. Please enter 'y' or 'n'.");            
+        }
         }
     }
 }
