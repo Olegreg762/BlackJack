@@ -53,7 +53,7 @@ fn play_game() {
             return;
         }
     }
-    
+    see_hand(&mut dealer_hand, "Dealer");
     if check_hand_value(&mut dealer_hand, "Dealer") > check_hand_value(&mut player_hand, "Player") {
         println!("Dealer wins!");
     } else if check_hand_value(&mut dealer_hand, "Dealer") < check_hand_value(&mut player_hand, "Player") {
