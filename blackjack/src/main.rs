@@ -13,7 +13,7 @@ fn main() {
 }
 fn player_money(money: &mut i32, change: i32) -> i32 {
     if change > 0 {
-        *money += ((change as f64) * 1.5) as i32;
+        *money += change * 2;
     } else {
         *money += change;
     }
@@ -100,7 +100,7 @@ fn play_game(money: &mut i32) {
         println!("Dealer wins!, you lost ${}.", bet_amount);
     } else if check_hand_value(&mut dealer_hand, "Dealer") < check_hand_value(&mut player_hand, "Player") {
         player_money(money, bet_amount);
-        println!("Player wins!, you won ${}.", (bet_amount as f64) * 1.5);
+        println!("Player wins!, you won ${}.", bet_amount * 2);
     } else {
         println!("It's a tie!");
     }
