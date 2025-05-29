@@ -2,15 +2,53 @@ use std::collections::HashMap;
 use std::io;
 
 fn main() {
+    let mut money: i32 = 100;
+    
     loop{
-    play_game();
+    play_game(&mut money);
     if !play_again(){
         break;
     }
     }
 }
+fn player_money(money: &mut i32, change: i32) -> i32 {
+    if change > 0 {
+        *money += ((change as f64) * 1.5) as i32;
+    } else {
+        *money += change;
+    }
+    if *money <= 0 {
+        println!("You have no money left! Game over.");
+        std::process::exit(0);
+    }
+    println!("You currently have ${}.", money);
+    *money
+    
+}
 
-fn play_game() {
+fn bet(money: i32) -> i32 {
+    loop {
+        let mut bet_amount = String::new();
+        println!("You have ${}. How much would you like to bet?", money);
+
+        io::stdin()
+            .read_line(&mut bet_amount)
+            .expect("Failed to read line");
+
+        match bet_amount.trim().parse::<i32>() {
+            Ok(num) if num > 1 && num <= money => {
+                println!("You have bet ${}.", num);
+                return num;
+            },
+            Ok(_) => println!("Invalid bet amount. You must bet between $2 and ${}.", money),
+            Err(_) => println!("Please enter a valid number."),
+        }
+    }
+}
+
+fn play_game(money: &mut i32) {
+    player_money(money, 0);
+    let bet_amount: i32 = bet(*money);
     let mut deck: HashMap<String, i8> = build_deck();
     let mut player_hand: HashMap<String, i8> = HashMap::new();
     let mut dealer_hand: HashMap<String, i8> = HashMap::new();
@@ -37,7 +75,9 @@ fn play_game() {
                 deal_card(&mut deck, &mut player_hand);
                 see_hand(&mut player_hand, "Player");
                 if has_bust(&mut player_hand, "Player") {
+                    player_money(money, -bet_amount);
                     return;
+                    
                 }
             },
             's' => {
@@ -50,14 +90,17 @@ fn play_game() {
     while check_hand_value(&mut dealer_hand, "Dealer") < 17 {
         deal_card(&mut deck, &mut dealer_hand);
         if has_bust(&mut dealer_hand, "Dealer"){
+            player_money(money, bet_amount);
             return;
         }
     }
     see_hand(&mut dealer_hand, "Dealer");
     if check_hand_value(&mut dealer_hand, "Dealer") > check_hand_value(&mut player_hand, "Player") {
-        println!("Dealer wins!");
+        player_money(money, -bet_amount);
+        println!("Dealer wins!, you lost ${}.", bet_amount);
     } else if check_hand_value(&mut dealer_hand, "Dealer") < check_hand_value(&mut player_hand, "Player") {
-        println!("Player wins!");
+        player_money(money, bet_amount);
+        println!("Player wins!, you won ${}.", (bet_amount as f64) * 1.5);
     } else {
         println!("It's a tie!");
     }
