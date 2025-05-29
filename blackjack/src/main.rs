@@ -79,6 +79,10 @@ fn play_game(money: &mut i32) {
                     return;
                     
                 }
+                if has_blackjack(&mut player_hand, "Player") {
+                    player_money(money, bet_amount);
+                    return;
+                }
             },
             "s" | "stay" => {
                 println!("You chose to stay.");
@@ -91,6 +95,10 @@ fn play_game(money: &mut i32) {
         deal_card(&mut deck, &mut dealer_hand);
         if has_bust(&mut dealer_hand, "Dealer"){
             player_money(money, bet_amount);
+            return;
+        }
+        if has_blackjack(&mut dealer_hand, "Dealer") {
+            player_money(money, -bet_amount);
             return;
         }
     }
@@ -106,16 +114,20 @@ fn play_game(money: &mut i32) {
     }
     
 }
-
+fn has_blackjack(hand: &mut HashMap<String, i8>, hand_name: &str) -> bool {
+    let value: i8 = check_hand_value(hand, hand_name);
+    if value == 21 {
+        println!("{} has BlackJack!!!\n", hand_name);
+        println!("{} has won the game.\n", hand_name);
+        return true;
+    }
+    false
+}
 fn has_bust(hand: &mut HashMap<String, i8>, hand_name: &str) -> bool{
     let value: i8 = check_hand_value(hand, hand_name);
     if value > 21 {
         println!("{} has busted!\n", hand_name);
         println!("{} has lost the game.\n", hand_name);
-        return true;
-    } else if value == 21 {
-        println!("{} has BackJack!!!\n", hand_name);
-        println!("{} has won the game.\n", hand_name);
         return true;
     } else {
         println!("{} is still in the game.\n", hand_name);
