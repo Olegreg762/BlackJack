@@ -36,11 +36,11 @@ fn bet(money: i32) -> i32 {
             .expect("Failed to read line");
 
         match bet_amount.trim().parse::<i32>() {
-            Ok(num) if num > 1 && num <= money => {
+            Ok(num) if num > 0 && num <= money => {
                 println!("You have bet ${}.", num);
                 return num;
             },
-            Ok(_) => println!("Invalid bet amount. You must bet between $2 and ${}.", money),
+            Ok(_) => println!("Invalid bet amount. You must bet between $1 and ${}.", money),
             Err(_) => println!("Please enter a valid number."),
         }
     }
