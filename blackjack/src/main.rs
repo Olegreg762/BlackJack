@@ -5,10 +5,10 @@ fn main() {
     let mut money: i32 = 100;
     
     loop{
-    play_game(&mut money);
-    if !play_again(){
-        break;
-    }
+        play_game(&mut money);
+        if !play_again(){
+            break;
+        }
     }
 }
 fn player_money(money: &mut i32, change: i32) -> i32 {
@@ -68,10 +68,10 @@ fn play_game(money: &mut i32) {
         let mut choice: String = String::new();
         println!("Do you want to hit or stay? (h/s)");
         io::stdin().read_line(&mut choice).expect("Failed to read line");
-        let choice: char = choice.trim().chars().next().unwrap_or(' ');
+        let choice= choice.trim().to_lowercase();
 
-        match choice {
-            'h' => {
+        match choice.as_str() {
+            "h" | "hit" => {
                 deal_card(&mut deck, &mut player_hand);
                 see_hand(&mut player_hand, "Player");
                 if has_bust(&mut player_hand, "Player") {
@@ -80,11 +80,11 @@ fn play_game(money: &mut i32) {
                     
                 }
             },
-            's' => {
+            "s" | "stay" => {
                 println!("You chose to stay.");
                 break;
             },
-            _ => println!("Invalid choice. Please enter 'h' or 's'."),
+            _ => println!("Invalid choice. Please enter 'h', 'hit', 's', or 'stay'."),
         }
     }
     while check_hand_value(&mut dealer_hand, "Dealer") < 17 {
@@ -96,11 +96,11 @@ fn play_game(money: &mut i32) {
     }
     see_hand(&mut dealer_hand, "Dealer");
     if check_hand_value(&mut dealer_hand, "Dealer") > check_hand_value(&mut player_hand, "Player") {
-        player_money(money, -bet_amount);
         println!("Dealer wins!, you lost ${}.", bet_amount);
+        player_money(money, -bet_amount);
     } else if check_hand_value(&mut dealer_hand, "Dealer") < check_hand_value(&mut player_hand, "Player") {
-        player_money(money, bet_amount);
         println!("Player wins!, you won ${}.", bet_amount * 2);
+        player_money(money, bet_amount);
     } else {
         println!("It's a tie!");
     }
