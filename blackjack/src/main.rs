@@ -11,6 +11,15 @@ fn main() {
         }
     }
 }
+
+fn _double_down() {
+    // Placeholder for double down functionality
+}
+
+fn _split_pair() {
+    // Placeholder for split pair functionality
+}
+
 fn player_money(money: &mut i32, change: i32) -> i32 {
     if change > 0 {
         *money += change * 2;
