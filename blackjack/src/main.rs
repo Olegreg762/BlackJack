@@ -71,6 +71,16 @@ fn play_game(money: &mut i32) {
         return;
     }
 
+    if has_blackjack(&mut player_hand, "Player") {
+        player_money(money, bet_amount);
+        return;
+    }
+
+    if has_blackjack(&mut dealer_hand, "Dealer") {
+        player_money(money, -bet_amount);
+        return;
+    }
+
     see_hand(&mut player_hand, "Player");
 
     loop {
@@ -85,13 +95,9 @@ fn play_game(money: &mut i32) {
                 see_hand(&mut player_hand, "Player");
                 if has_bust(&mut player_hand, "Player") {
                     player_money(money, -bet_amount);
-                    return;
-                    
+                    return;                    
                 }
-                if has_blackjack(&mut player_hand, "Player") {
-                    player_money(money, bet_amount);
-                    return;
-                }
+                
             },
             "s" | "stay" => {
                 println!("You chose to stay.");
@@ -104,10 +110,6 @@ fn play_game(money: &mut i32) {
         deal_card(&mut deck, &mut dealer_hand);
         if has_bust(&mut dealer_hand, "Dealer"){
             player_money(money, bet_amount);
-            return;
-        }
-        if has_blackjack(&mut dealer_hand, "Dealer") {
-            player_money(money, -bet_amount);
             return;
         }
     }
