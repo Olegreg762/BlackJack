@@ -92,7 +92,6 @@ impl Player {
             println!("You have no money left! Game over.");
             std::process::exit(0);
         }
-        println!("You currently have ${}.", self.money);
         self.money
         
     }
